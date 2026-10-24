@@ -1,135 +1,54 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="El Tribunal de la Tinta: literatura, análisis, reseñas y debate. Cada libro tiene una historia. Cada historia merece ser cuestionada.">
-  <title>El Tribunal de la Tinta | Literatura, análisis y debate</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="icon" href="images/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-<header class="site-header">
-  <a class="brand" href="index.html" aria-label="El Tribunal de la Tinta, inicio">
-    <svg class="brand-mark" viewBox="0 0 80 80" role="img" aria-label="Balanza, pluma y libros">
-      <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M40 9v42M24 17h32M40 9l-4 5h8zM24 17 12 39m12-22 12 22M56 17 44 39m12-22 12 22"/>
-        <path d="M5 39h14c-1 8-13 8-14 0zm28 0h14c-1 8-13 8-14 0zM12 50h56M17 55h46M22 60h36"/>
-        <path d="M46 8c-2 14-7 25-16 38 12-6 19-19 16-38z"/>
-      </g>
-    </svg>
-    <span class="brand-name">EL TRIBUNAL<br><span>DE LA TINTA</span></span>
-  </a>
-  <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰</button>
-  <nav class="main-nav" aria-label="Navegación principal">
-    <a class="active" href="index.html">Inicio</a>
-    <a href="articulos.html">Artículos</a>
-    <a href="resenas.html">Reseñas</a>
-    <a href="comunidad.html">Comunidad</a>
-    <a href="sobre-mi.html">Sobre mí</a>
-    <a href="calendario.html">Calendario</a>
-  </nav>
-  <a class="header-cta" href="comunidad.html#publicar">Publica tu reseña <span>↗</span></a>
-</header>
-
-<main>
-  <section class="hero">
-    <div class="hero-copy">
-      <p class="eyebrow">LITERATURA · ANÁLISIS · DEBATE</p>
-      <h1>EL TRIBUNAL<br>DE LA <em>TINTA</em></h1>
-      <p class="hero-tagline">Cada libro tiene una historia.<br>Cada historia merece ser cuestionada.</p>
-      <a class="button button-dark" href="articulos.html">Explorar el blog <span>→</span></a>
-    </div>
-    <div class="hero-image" role="img" aria-label="Libros antiguos, una pluma y una tela color vino tinto"></div>
-    <div class="hero-stamp">LECTURAS<br><span>BAJO</span><br>EXAMEN</div>
-  </section>
-
-  <section class="featured section-wrap">
-    <div class="featured-image image-handmaid" role="img" aria-label="Bodegón literario en tonos oscuros"></div>
-    <div class="featured-copy">
-      <p class="eyebrow red">ARTÍCULO DESTACADO · DISTOPÍA</p>
-      <h2>El cuento de la criada:<br><em>¿distopía o advertencia?</em></h2>
-      <p>¿Qué ocurre cuando una sociedad decide que la libertad de algunas personas es negociable? La novela de Margaret Atwood nos invita a examinar el poder, el control y los derechos individuales.</p>
-      <div class="meta">ANÁLISIS LITERARIO <span>•</span> LECTURA Y DEBATE</div>
-      <a class="text-link" href="articulo-criada.html">Entrar al debate <span>→</span></a>
-    </div>
-    <aside class="quote-card">
-      <span class="quote-mark">“</span>
-      <blockquote>Un libro no termina en su última página: empieza la conversación.</blockquote>
-      <span class="quote-rule"></span>
-      <p>EL TRIBUNAL DE LA TINTA</p>
-    </aside>
-  </section>
-
-  <section class="content-grid section-wrap">
-    <div class="content-column articles-column">
-      <div class="section-heading">
-        <div><p class="eyebrow">PARA PENSAR</p><h2>Artículos recientes</h2></div>
-        <a class="text-link small" href="articulos.html">Ver todos ↗</a>
-      </div>
-      <article class="mini-card">
-        <a class="mini-image image-1984" href="articulos.html" aria-label="Ver artículos sobre distopías"></a>
-        <p class="category">DISTOPÍA · ANÁLISIS</p>
-        <h3><a href="articulos.html">1984: el poder de controlar la verdad</a></h3>
-        <p class="card-excerpt">Cuando vigilar también significa decidir qué es real.</p>
-        <p class="date">PRÓXIMAMENTE</p>
-      </article>
-      <article class="mini-card">
-        <a class="mini-image image-frankenstein" href="articulos.html" aria-label="Ver artículos sobre Frankenstein"></a>
-        <p class="category">CLÁSICOS · REFLEXIÓN</p>
-        <h3><a href="articulos.html">Frankenstein: ¿quién es el verdadero monstruo?</a></h3>
-        <p class="card-excerpt">Una historia sobre creación, abandono y responsabilidad.</p>
-        <p class="date">PRÓXIMAMENTE</p>
-      </article>
-    </div>
-
-    <div class="content-column reviews-column">
-      <div class="section-heading">
-        <div><p class="eyebrow">MI ESTANTERÍA</p><h2>Reseñas</h2></div>
-        <a class="text-link small" href="resenas.html">Ver todas ↗</a>
-      </div>
-      <article class="review-feature">
-        <div class="book-cover cover-red"><span>NORMAL<br>PEOPLE</span><small>SALLY ROONEY</small></div>
-        <div><p class="category">RESEÑA · FICCIÓN</p><h3>Normal People</h3><p class="muted">Una lectura sobre intimidad, distancia y las cosas que no sabemos decir.</p><a class="text-link small" href="resenas.html">Leer reseñas ↗</a></div>
-      </article>
-      <article class="review-feature">
-        <div class="book-cover cover-sand"><span>DUNE</span><small>FRANK HERBERT</small></div>
-        <div><p class="category">RESEÑA · CIENCIA FICCIÓN</p><h3>Dune</h3><p class="muted">Poder, destino y supervivencia en un universo inmenso.</p><a class="text-link small" href="resenas.html">Leer reseñas ↗</a></div>
-      </article>
-    </div>
-
-    <aside class="community-column">
-      <div class="section-heading">
-        <div><p class="eyebrow">OTRAS MIRADAS</p><h2>La comunidad</h2></div>
-      </div>
-      <p class="community-intro">Las lecturas también se enriquecen cuando alguien más nos cuenta qué encontró entre las páginas.</p>
-      <div class="community-note"><span class="note-icon">✎</span><div><strong>Tu voz tiene un lugar.</strong><p>Comparte una reseña, recomienda una lectura y descubre otras perspectivas.</p></div></div>
-      <a class="button button-outline" href="comunidad.html#publicar">Publicar una reseña <span>↗</span></a>
-    </aside>
-  </section>
-
-  <section class="invitation">
-    <p class="eyebrow">SE ABRE LA SESIÓN</p>
-    <h2>¿Qué libro merece ser <em>cuestionado</em>?</h2>
-    <p>Trae tus argumentos, tu curiosidad y esa lectura que todavía te ronda la cabeza.</p>
-    <a class="button button-light" href="comunidad.html#publicar">Únete a la conversación <span>→</span></a>
-  </section>
-</main>
-
-<footer class="site-footer">
-  <div class="footer-main">
-    <a class="brand footer-brand" href="index.html">
-      <svg class="brand-mark" viewBox="0 0 80 80" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M40 9v42M24 17h32M40 9l-4 5h8zM24 17 12 39m12-22 12 22M56 17 44 39m12-22 12 22"/><path d="M5 39h14c-1 8-13 8-14 0zm28 0h14c-1 8-13 8-14 0zM12 50h56M17 55h46M22 60h36"/><path d="M46 8c-2 14-7 25-16 38 12-6 19-19 16-38z"/></g></svg>
-      <span class="brand-name">EL TRIBUNAL<br><span>DE LA TINTA</span></span>
-    </a>
-    <p class="footer-motto">Cada libro tiene una historia.<br>Cada historia merece ser cuestionada.</p>
-    <div class="footer-links"><strong>Explora</strong><a href="articulos.html">Artículos</a><a href="resenas.html">Reseñas</a><a href="comunidad.html">Comunidad</a></div>
-    <div class="footer-links"><strong>El proyecto</strong><a href="sobre-mi.html">Sobre mí</a><a href="calendario.html">Calendario</a><a href="sobre-mi.html#contacto">Contacto</a></div>
-  </div>
-  <div class="footer-bottom"><span>© <span id="year"></span> El Tribunal de la Tinta</span><span>Literatura · Pensamiento · Comunidad</span></div>
-</footer>
-<script src="js/main.js"></script>
-</body>
-</html>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>El Tribunal de la Tinta</title>
+<meta name="description" content="Literatura, análisis, reseñas y debate. Cada libro tiene una historia. Cada historia merece ser cuestionada.">
+<link rel="stylesheet" href="style.css"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,500&family=Lora&display=swap" rel="stylesheet"></head><body>
+<header><a class="logo" href="#/">El Tribunal de la <em>Tinta</em></a><nav id="nav"></nav></header>
+<main id="app"></main>
+<footer>© El Tribunal de la Tinta · Literatura, pensamiento y comunidad</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script>
+const sb=supabase.createClient(TT.SUPABASE_URL,TT.SUPABASE_ANON_KEY),app=document.getElementById('app');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=d=>new Date(d+'T00:00').toLocaleDateString('es',{day:'numeric',month:'long',year:'numeric'});
+const stars=n=>n?'★'.repeat(n)+'☆'.repeat(5-n):'';
+const paras=t=>esc(t).split(/\n\s*\n/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
+const today=()=>new Date().toISOString().slice(0,10);
+const NAV=[['','Inicio'],['articulos','Artículos'],['resenas','Reseñas'],['comunidad','Comunidad'],['sobre-mi','Sobre mí'],['calendario','Calendario']];
+document.getElementById('nav').innerHTML=NAV.map(n=>`<a href="#/${n[0]}" data-r="${n[0]}">${n[1]}</a>`).join('');
+let posts=null;
+async function load(){if(posts)return posts;const {data,error}=await sb.from('posts').select('*').eq('status','publicado').order('publish_date',{ascending:false});if(error)throw error;return posts=data}
+const live=()=>posts.filter(p=>p.publish_date<=today());
+const card=p=>`<a class="card" href="#/post/${p.id}">${p.cover_url?`<img src="${esc(p.cover_url)}" alt="">`:''}<small>${esc(p.category||p.genre||'')} · ${fmt(p.publish_date)}</small><h3>${esc(p.title)}</h3>${p.kind=='resena'?`<div class="st">${esc(p.book_author||'')} ${stars(p.rating)}</div>`:''}<p>${esc(p.excerpt||'')}</p></a>`;
+const grid=a=>a.length?`<div class="grid">${a.map(card).join('')}</div>`:'<p class="mut">Aún no hay publicaciones aquí.</p>';
+const V={
+async ''(){const l=live(),f=l.find(p=>p.featured)||l[0];
+return `<section class="hero"><p class="mut">Literatura, análisis y debate</p><h1>El Tribunal de la <em>Tinta</em></h1><p>Cada libro tiene una historia.<br>Cada historia merece ser cuestionada.</p></section>`
++(f?`<section class="feat"><small style="color:#e9cfd4">Destacado</small><h2>${esc(f.title)}</h2><p>${esc(f.excerpt||'')}</p><a class="btn" href="#/post/${f.id}">Entrar al debate</a></section>`:'')
++`<h2>Últimas publicaciones</h2>${grid(l.filter(p=>p.kind=='articulo').slice(0,4))}<h2>Reseñas recientes</h2>${grid(l.filter(p=>p.kind=='resena').slice(0,4))}`},
+async articulos(){return `<h1>Artículos</h1>`+grid(live().filter(p=>p.kind=='articulo'))},
+async resenas(){const r=live().filter(p=>p.kind=='resena'),g=[...new Set(r.map(p=>p.genre).filter(Boolean))];
+return `<h1>Reseñas</h1><div class="bar"><select id="fg"><option value="">Todos los géneros</option>${g.map(x=>`<option>${esc(x)}</option>`).join('')}</select><select id="fo"><option value="d">Más recientes</option><option value="r">Mejor valoradas</option></select></div><div id="rl">${grid(r)}</div>`},
+async post(id){const p=posts.find(x=>x.id==id);if(!p||p.publish_date>today())return '<p>Esta publicación no está disponible.</p>';
+const {data:c}=await sb.from('comments').select('name,body,created_at').eq('post_id',id).eq('status','aprobada').order('created_at');
+return `<article><small>${esc(p.category||'')} · ${fmt(p.publish_date)}</small><h1>${esc(p.title)}</h1>${p.cover_url?`<img class="ph" src="${esc(p.cover_url)}" alt="">`:''}`
++(p.kind=='resena'?`<p class="st">${esc(p.book_author||'')} · ${esc(p.genre||'')} ${stars(p.rating)}</p>`:'')+paras(p.content)
++`<h2>Comentarios</h2>${(c||[]).map(x=>`<div class="rev"><b>${esc(x.name)}</b><br>${esc(x.body)}</div>`).join('')||'<p class="mut">Sé la primera persona en comentar.</p>'}
+<form id="cf"><label>Nombre<input name="name" required maxlength="60"></label><label>Comentario<textarea name="body" rows="4" required minlength="2" maxlength="1500"></textarea></label><input class="hp" name="web" tabindex="-1" autocomplete="off"><button>Enviar comentario</button><p class="mut">Los comentarios se publican cuando se aprueban.</p></form></article>`},
+async 'sobre-mi'(){const {data}=await sb.from('site').select('value').eq('key','about').maybeSingle(),v=data?.value||{};
+const L=[['instagram','Instagram'],['tiktok','TikTok'],['goodreads','Goodreads']].filter(x=>v[x[0]]).map(x=>`<a href="${esc(v[x[0]])}" rel="noopener">${x[1]}</a>`).join(' · ');
+return `<article><h1>Sobre mí</h1>${v.photo_url?`<img class="ph" src="${esc(v.photo_url)}" alt="">`:''}${paras(v.bio)}<h3>Mi trayectoria como lectora</h3>${paras(v.journey)}<h3>Por qué existe este blog</h3>${paras(v.why)}<h3>Qué encontrarás aquí</h3>${paras(v.offers)}<p>${L}</p></article>`},
+async calendario(){const m={},t=today();[...posts].sort((a,b)=>a.publish_date<b.publish_date?-1:1).forEach(p=>(m[p.publish_date.slice(0,7)]??=[]).push(p));
+return '<h1>Calendario editorial</h1>'+(Object.keys(m).map(k=>`<h3>${new Date(k+'-01T00:00').toLocaleDateString('es',{month:'long',year:'numeric'})}</h3><ul class="cal">${m[k].map(p=>`<li><b>${p.publish_date.slice(8)}</b> ${p.publish_date>t?esc(p.title):`<a href="#/post/${p.id}">${esc(p.title)}</a>`} <small>${p.kind=='resena'?'Reseña':'Artículo'}${p.publish_date>t?' · próximamente':''}</small></li>`).join('')}</ul>`).join('')||'<p class="mut">Sin publicaciones programadas.</p>')},
+async comunidad(){const {data}=await sb.from('submissions').select('*').eq('status','aprobada').order('created_at',{ascending:false});
+return `<h1>Comunidad lectora</h1><p>Comparte tu reseña de un libro. La revisaré antes de publicarla.</p>
+<form id="sf"><label>Título del libro<input name="book_title" required maxlength="150"></label><label>Autor o autora<input name="book_author" maxlength="150"></label><label>Valoración<select name="rating">${[5,4,3,2,1].map(n=>`<option value="${n}">${stars(n)}</option>`).join('')}</select></label><label>Tu opinión<textarea name="opinion" rows="6" required minlength="20" maxlength="3000"></textarea></label><label>Tu nombre<input name="reader_name" required maxlength="60"></label><input class="hp" name="web" tabindex="-1" autocomplete="off"><button>Enviar reseña</button></form>
+<h2>Reseñas de lectores</h2>${(data||[]).map(x=>`<div class="rev"><b>${esc(x.book_title)}</b> ${esc(x.book_author||'')} ${stars(x.rating)}<br>${esc(x.opinion)}<br><small>${esc(x.reader_name)}</small></div>`).join('')||'<p class="mut">Aún no hay reseñas de lectores.</p>'}`}};
+function bind(id,fn,msg){const f=document.getElementById(id);if(!f)return;f.onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(f));if(d.web)return;const {error}=await fn(d);f.outerHTML=`<p class="${error?'err':'ok'}">${error?'No se pudo enviar. Inténtalo de nuevo.':msg}</p>`}}
+async function route(){const [r0,a]=(location.hash.slice(2)).split('/'),r=r0 in V?r0:'';app.classList.remove('in');
+try{await load();app.innerHTML=await V[r](a)}catch(e){app.innerHTML='<p class="err">No se pudo cargar el contenido. Revisa config.js y que setup.sql esté ejecutado.</p>'}
+if(r=='resenas'){const f=()=>{let x=live().filter(p=>p.kind=='resena');if(fg.value)x=x.filter(p=>p.genre==fg.value);if(fo.value=='r')x.sort((p,q)=>q.rating-p.rating);rl.innerHTML=grid(x)};fg.onchange=fo.onchange=f}
+if(r=='post')bind('cf',d=>sb.from('comments').insert({post_id:a,name:d.name,body:d.body}),'Gracias. Tu comentario se publicará cuando sea aprobado.');
+if(r=='comunidad')bind('sf',d=>sb.from('submissions').insert({book_title:d.book_title,book_author:d.book_author,rating:+d.rating,opinion:d.opinion,reader_name:d.reader_name}),'Gracias. Tu reseña se publicará cuando sea aprobada.');
+document.querySelectorAll('nav a').forEach(x=>x.classList.toggle('on',x.dataset.r==r));scrollTo(0,0);requestAnimationFrame(()=>app.classList.add('in'))}
+addEventListener('hashchange',route);route();
+</script></body></html>

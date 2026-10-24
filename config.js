@@ -1,0 +1,1 @@
+window.TT={SUPABASE_URL:"https://feaxgrwhdjbzcdhcxwsd.supabase.co",SUPABASE_ANON_KEY:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlYXhncndoZGpiemNkaGN4d3NkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4NjE3OTMsImV4cCI6MjEwODQzNzc5M30.WfdJuNqAhB_d-cmJycfGc6Jxpvs4ixfjGO4DtC2mzDo"};

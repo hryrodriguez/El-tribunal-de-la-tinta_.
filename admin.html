@@ -1,0 +1,48 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Administración · El Tribunal de la Tinta</title><link rel="stylesheet" href="style.css"></head><body>
+<header><span class="logo">Administración</span><nav id="tabs" hidden><a href="#" data-v="posts">Publicaciones</a><a href="#" data-v="pend">Pendientes</a><a href="#" data-v="about">Sobre mí</a><a href="#" id="out">Salir</a></nav></header>
+<main class="in" id="main"></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script>
+const sb=supabase.createClient(TT.SUPABASE_URL,TT.SUPABASE_ANON_KEY),main=document.getElementById('main'),tabs=document.getElementById('tabs');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const F=(n,l,v='',t='text')=>`<label>${l}<input name="${n}" type="${t}" value="${esc(v)}"></label>`;
+const T=(n,l,v='',r=5)=>`<label>${l}<textarea name="${n}" rows="${r}">${esc(v)}</textarea></label>`;
+function login(msg=''){tabs.hidden=true;main.innerHTML=`<form id="lf"><h2>Entrar</h2>${F('email','Correo','','email')}${F('password','Contraseña','','password')}<p class="err">${msg}</p><button>Entrar</button></form>`;
+document.getElementById('lf').onsubmit=async e=>{e.preventDefault();const f=e.target,{error}=await sb.auth.signInWithPassword({email:f.email.value,password:f.password.value});if(error)return login('Correo o contraseña incorrectos.');const {data}=await sb.rpc('is_admin');if(!data){await sb.auth.signOut();return login('Esta cuenta no es de administración.')}go('posts')}}
+function go(v){tabs.hidden=false;views[v]()}
+function form(p={}){main.innerHTML=`<form id="pf"><h2>${p.id?'Editar':'Nueva'} publicación</h2>
+<label>Tipo<select name="kind"><option value="articulo">Artículo</option><option value="resena">Reseña</option></select></label>
+${F('title','Título',p.title)}${F('excerpt','Resumen corto',p.excerpt)}${F('cover_url','URL de la imagen de portada',p.cover_url,'url')}${F('category','Categoría',p.category)}
+${F('book_author','Autor del libro (reseñas)',p.book_author)}${F('genre','Género (reseñas)',p.genre)}
+<label>Puntuación (reseñas)<select name="rating"><option value="">Sin puntuación</option>${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join('')}</select></label>
+${F('publish_date','Fecha de publicación',p.publish_date||new Date().toISOString().slice(0,10),'date')}
+${T('content','Contenido (una línea en blanco separa párrafos)',p.content,14)}
+<label class="chk"><input type="checkbox" name="featured" ${p.featured?'checked':''}> Destacar en la portada</label>
+<button value="publicado">Publicar</button> <button value="borrador" class="sec">Guardar borrador</button> <button type="button" class="sec" data-a="cx">Cancelar</button></form>`;
+const f=document.getElementById('pf');f.kind.value=p.kind||'articulo';f.rating.value=p.rating||'';
+f.onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(f)),feat=f.featured.checked;
+const row={kind:d.kind,title:d.title,excerpt:d.excerpt,cover_url:d.cover_url,category:d.category,book_author:d.book_author,genre:d.genre,rating:d.rating?+d.rating:null,publish_date:d.publish_date,content:d.content,status:e.submitter.value,featured:feat};
+if(feat)await sb.from('posts').update({featured:false}).neq('id',p.id||'00000000-0000-0000-0000-000000000000');
+const {error}=await(p.id?sb.from('posts').update(row).eq('id',p.id):sb.from('posts').insert(row));
+if(error)return alert('No se pudo guardar: '+error.message);go('posts')}}
+const views={
+async posts(){const {data,error}=await sb.from('posts').select('id,title,kind,status,publish_date,featured').order('publish_date',{ascending:false});
+if(error)return main.innerHTML='<p class="err">'+esc(error.message)+'</p>';
+main.innerHTML=`<h2>Publicaciones</h2><button data-a="new">Nueva publicación</button><ul class="rows">${data.map(p=>`<li><b>${esc(p.title)}</b>${p.featured?' (destacada)':''}<br><small>${p.kind=='resena'?'Reseña':'Artículo'} · ${p.status} · ${p.publish_date}</small><span><button class="sec" data-a="edit" data-id="${p.id}">Editar</button><button class="sec" data-a="delp" data-id="${p.id}">Eliminar</button></span></li>`).join('')||'<li>Aún no hay publicaciones.</li>'}</ul>`},
+async pend(){const [s,c]=await Promise.all([sb.from('submissions').select('*').order('created_at',{ascending:false}).limit(100),sb.from('comments').select('*,posts(title)').order('created_at',{ascending:false}).limit(100)]);
+const btn=(t,x)=>['aprobada','rechazada'].map(v=>`<button class="sec" data-a="st" data-t="${t}" data-s="${v}" data-id="${x.id}">${v=='aprobada'?'Aprobar':'Rechazar'}</button>`).join('')+`<button class="sec" data-a="deli" data-t="${t}" data-id="${x.id}">Eliminar</button>`;
+main.innerHTML=`<h2>Reseñas de lectores</h2><ul class="rows">${(s.data||[]).map(x=>`<li><b>${esc(x.book_title)}</b> ${esc(x.book_author||'')} ${'★'.repeat(x.rating)}<br><small>${esc(x.reader_name)} · ${x.status}</small><p>${esc(x.opinion)}</p><span>${btn('submissions',x)}</span></li>`).join('')||'<li>Sin envíos.</li>'}</ul>
+<h2>Comentarios</h2><ul class="rows">${(c.data||[]).map(x=>`<li><b>${esc(x.name)}</b> en «${esc(x.posts?.title||'')}»<br><small>${x.status}</small><p>${esc(x.body)}</p><span>${btn('comments',x)}</span></li>`).join('')||'<li>Sin comentarios.</li>'}</ul>`},
+async about(){const {data}=await sb.from('site').select('value').eq('key','about').maybeSingle(),v=data?.value||{};
+main.innerHTML=`<form id="af"><h2>Sobre mí</h2>${T('bio','Biografía',v.bio)}${T('journey','Experiencia y trayectoria como lectora',v.journey)}${T('why','Por qué creé el blog',v.why)}${T('offers','Qué ofrece a los lectores',v.offers)}${F('photo_url','URL de tu fotografía',v.photo_url,'url')}${F('instagram','Enlace de Instagram',v.instagram,'url')}${F('tiktok','Enlace de TikTok',v.tiktok,'url')}${F('goodreads','Enlace de Goodreads',v.goodreads,'url')}<button>Guardar</button></form>`;
+document.getElementById('af').onsubmit=async e=>{e.preventDefault();const {error}=await sb.from('site').upsert({key:'about',value:Object.fromEntries(new FormData(e.target))});alert(error?error.message:'Guardado')}}};
+main.onclick=async e=>{const b=e.target.closest('[data-a]');if(!b)return;const {a,id,t,s}=b.dataset;
+if(a=='new')return form();if(a=='cx')return go('posts');
+if(a=='edit'){const {data}=await sb.from('posts').select('*').eq('id',id).single();return form(data)}
+if(a=='delp'&&confirm('¿Eliminar esta publicación?')){await sb.from('posts').delete().eq('id',id);return go('posts')}
+if(a=='st'){await sb.from(t).update({status:s}).eq('id',id);return go('pend')}
+if(a=='deli'&&confirm('¿Eliminar definitivamente?')){await sb.from(t).delete().eq('id',id);return go('pend')}};
+tabs.onclick=e=>{e.preventDefault();const a=e.target.closest('a');if(!a)return;a.id=='out'?sb.auth.signOut().then(()=>login()):go(a.dataset.v)};
+sb.auth.getSession().then(async({data})=>{data.session&&(await sb.rpc('is_admin')).data?go('posts'):login()});
+</script></body></html>
