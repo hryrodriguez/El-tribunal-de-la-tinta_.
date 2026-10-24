@@ -1,0 +1,35 @@
+name: Publicar una reseña
+description: Comparte una reseña literaria con la comunidad.
+title: "Reseña: "
+labels: ["reseña-comunidad"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por contribuir a El Tribunal de la Tinta. Tu reseña será pública. No incluyas spoilers sin avisar y mantén un tono respetuoso.
+  - type: input
+    id: book
+    attributes:
+      label: Libro y autor/a
+      placeholder: Título — Autor/a
+    validations:
+      required: true
+  - type: dropdown
+    id: rating
+    attributes:
+      label: Calificación
+      options:
+        - 5/5
+        - 4/5
+        - 3/5
+        - 2/5
+        - 1/5
+    validations:
+      required: true
+  - type: textarea
+    id: review
+    attributes:
+      label: Tu reseña
+      description: Explica qué te pareció, qué temas destacarías y a quién se lo recomendarías.
+    validations:
+      required: true
