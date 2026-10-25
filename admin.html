@@ -1,5 +1,5 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Administración · El Tribunal de la Tinta</title><link rel="stylesheet" href="style.css"></head><body>
-<header><span class="logo">Administración</span><nav id="tabs" hidden><a href="#" data-v="posts">Publicaciones</a><a href="#" data-v="pend">Pendientes</a><a href="#" data-v="about">Sobre mí</a><a href="#" id="out">Salir</a></nav></header>
+<header><span class="logo">Administración</span><nav id="tabs" hidden><a href="#" data-v="posts">Publicaciones</a><a href="#" data-v="pend">Pendientes</a><a href="#" data-v="about">Sobre mí</a><a href="index.html">Ver blog</a><a href="#" id="out">Salir</a></nav></header>
 <main class="in" id="main"></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
@@ -8,7 +8,7 @@ const sb=supabase.createClient(TT.SUPABASE_URL,TT.SUPABASE_ANON_KEY),main=docume
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const F=(n,l,v='',t='text')=>`<label>${l}<input name="${n}" type="${t}" value="${esc(v)}"></label>`;
 const T=(n,l,v='',r=5)=>`<label>${l}<textarea name="${n}" rows="${r}">${esc(v)}</textarea></label>`;
-function login(msg=''){tabs.hidden=true;main.innerHTML=`<form id="lf"><h2>Entrar</h2>${F('email','Correo','','email')}${F('password','Contraseña','','password')}<p class="err">${msg}</p><button>Entrar</button></form>`;
+function login(msg=''){tabs.hidden=true;main.innerHTML=`<form id="lf"><h2>Entrar</h2>${F('email','Correo','','email')}${F('password','Contraseña','','password')}<p class="err">${msg}</p><button>Entrar</button> <a href="index.html">Volver al blog</a></form>`;
 document.getElementById('lf').onsubmit=async e=>{e.preventDefault();const f=e.target,{error}=await sb.auth.signInWithPassword({email:f.email.value,password:f.password.value});if(error)return login('Correo o contraseña incorrectos.');const {data}=await sb.rpc('is_admin');if(!data){await sb.auth.signOut();return login('Esta cuenta no es de administración.')}go('posts')}}
 function go(v){tabs.hidden=false;views[v]()}
 function form(p={}){main.innerHTML=`<form id="pf"><h2>${p.id?'Editar':'Nueva'} publicación</h2>
@@ -43,6 +43,6 @@ if(a=='edit'){const {data}=await sb.from('posts').select('*').eq('id',id).single
 if(a=='delp'&&confirm('¿Eliminar esta publicación?')){await sb.from('posts').delete().eq('id',id);return go('posts')}
 if(a=='st'){await sb.from(t).update({status:s}).eq('id',id);return go('pend')}
 if(a=='deli'&&confirm('¿Eliminar definitivamente?')){await sb.from(t).delete().eq('id',id);return go('pend')}};
-tabs.onclick=e=>{e.preventDefault();const a=e.target.closest('a');if(!a)return;a.id=='out'?sb.auth.signOut().then(()=>login()):go(a.dataset.v)};
+tabs.onclick=e=>{e.preventDefault();const a=e.target.closest('a');if(!a)return;if(a.dataset.v===undefined&&a.id!='out'){location.href=a.href;return}a.id=='out'?sb.auth.signOut().then(()=>login()):go(a.dataset.v)};
 sb.auth.getSession().then(async({data})=>{data.session&&(await sb.rpc('is_admin')).data?go('posts'):login()});
 </script></body></html>
