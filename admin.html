@@ -1,4 +1,4 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Administración · El Tribunal de la Tinta</title><link rel="stylesheet" href="style.css"></head><body>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Administración · El Tribunal de la Tinta</title><link rel="stylesheet" href="style.css"><style>[hidden]{display:none!important}</style></head><body>
 <header><span class="logo">Administración</span><nav id="tabs" hidden><a href="#" data-v="posts">Publicaciones</a><a href="#" data-v="pend">Pendientes</a><a href="#" data-v="about">Sobre mí</a><a href="index.html">Ver blog</a><a href="#" id="out">Salir</a></nav></header>
 <main class="in" id="main"></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -10,7 +10,7 @@ const F=(n,l,v='',t='text')=>`<label>${l}<input name="${n}" type="${t}" value="$
 const T=(n,l,v='',r=5)=>`<label>${l}<textarea name="${n}" rows="${r}">${esc(v)}</textarea></label>`;
 function login(msg=''){tabs.hidden=true;main.innerHTML=`<form id="lf"><h2>Entrar</h2>${F('email','Correo','','email')}${F('password','Contraseña','','password')}<p class="err">${msg}</p><button>Entrar</button> <a href="index.html">Volver al blog</a></form>`;
 document.getElementById('lf').onsubmit=async e=>{e.preventDefault();const f=e.target,{error}=await sb.auth.signInWithPassword({email:f.email.value,password:f.password.value});if(error)return login('Correo o contraseña incorrectos.');const {data}=await sb.rpc('is_admin');if(!data){await sb.auth.signOut();return login('Esta cuenta no es de administración.')}go('posts')}}
-function go(v){tabs.hidden=false;views[v]()}
+async function go(v){const {data}=await sb.auth.getSession();if(!data.session)return login();tabs.hidden=false;views[v]()}
 function form(p={}){main.innerHTML=`<form id="pf"><h2>${p.id?'Editar':'Nueva'} publicación</h2>
 <label>Tipo<select name="kind"><option value="articulo">Artículo</option><option value="resena">Reseña</option></select></label>
 ${F('title','Título',p.title)}${F('excerpt','Resumen corto',p.excerpt)}${F('cover_url','URL de la imagen de portada',p.cover_url,'url')}${F('category','Categoría',p.category)}
@@ -37,12 +37,12 @@ main.innerHTML=`<h2>Reseñas de lectores</h2><ul class="rows">${(s.data||[]).map
 async about(){const {data}=await sb.from('site').select('value').eq('key','about').maybeSingle(),v=data?.value||{};
 main.innerHTML=`<form id="af"><h2>Sobre mí</h2>${T('bio','Biografía',v.bio)}${T('journey','Experiencia y trayectoria como lectora',v.journey)}${T('why','Por qué creé el blog',v.why)}${T('offers','Qué ofrece a los lectores',v.offers)}${F('quote','Cita destacada',v.quote)}${F('quote_by','Autor y obra de la cita',v.quote_by)}${F('photo_url','URL de tu fotografía',v.photo_url,'url')}${F('hero_url','Foto de la portada del inicio (URL)',v.hero_url,'url')}${F('logo_url','Logo (URL)',v.logo_url,'url')}${F('instagram','Enlace de Instagram',v.instagram,'url')}${F('tiktok','Enlace de TikTok',v.tiktok,'url')}${F('goodreads','Enlace de Goodreads',v.goodreads,'url')}<button>Guardar</button></form>`;
 document.getElementById('af').onsubmit=async e=>{e.preventDefault();const {error}=await sb.from('site').upsert({key:'about',value:Object.fromEntries(new FormData(e.target))});alert(error?error.message:'Guardado')}}};
-main.onclick=async e=>{const b=e.target.closest('[data-a]');if(!b)return;const {a,id,t,s}=b.dataset;
+main.onclick=async e=>{if(tabs.hidden)return;const b=e.target.closest('[data-a]');if(!b)return;const {a,id,t,s}=b.dataset;
 if(a=='new')return form();if(a=='cx')return go('posts');
 if(a=='edit'){const {data}=await sb.from('posts').select('*').eq('id',id).single();return form(data)}
 if(a=='delp'&&confirm('¿Eliminar esta publicación?')){await sb.from('posts').delete().eq('id',id);return go('posts')}
 if(a=='st'){await sb.from(t).update({status:s}).eq('id',id);return go('pend')}
 if(a=='deli'&&confirm('¿Eliminar definitivamente?')){await sb.from(t).delete().eq('id',id);return go('pend')}};
-tabs.onclick=e=>{e.preventDefault();const a=e.target.closest('a');if(!a)return;if(a.dataset.v===undefined&&a.id!='out'){location.href=a.href;return}a.id=='out'?sb.auth.signOut().then(()=>login()):go(a.dataset.v)};
+tabs.onclick=e=>{if(tabs.hidden)return;e.preventDefault();const a=e.target.closest('a');if(!a)return;if(a.dataset.v===undefined&&a.id!='out'){location.href=a.href;return}a.id=='out'?sb.auth.signOut().then(()=>login()):go(a.dataset.v)};
 sb.auth.getSession().then(async({data})=>{data.session&&(await sb.rpc('is_admin')).data?go('posts'):login()});
 </script></body></html>
