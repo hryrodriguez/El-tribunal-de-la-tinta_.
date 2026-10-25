@@ -1,30 +1,39 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>El Tribunal de la Tinta</title>
 <meta name="description" content="Literatura, análisis, reseñas y debate. Cada libro tiene una historia. Cada historia merece ser cuestionada.">
 <link rel="stylesheet" href="style.css"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,500&family=Lora&display=swap" rel="stylesheet"></head><body>
-<header><a class="logo" href="#/">El Tribunal de la <em>Tinta</em></a><nav id="nav"></nav></header>
+<header><a class="logo" href="#/" id="logo"><span>El Tribunal<br>de la Tinta</span></a><nav id="nav"></nav><form id="sq" role="search"><input name="q" placeholder="Buscar" aria-label="Buscar"></form></header>
 <main id="app"></main>
-<footer>© El Tribunal de la Tinta · Literatura, pensamiento y comunidad</footer>
+<footer id="ft"></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
 <script>
 const sb=supabase.createClient(TT.SUPABASE_URL,TT.SUPABASE_ANON_KEY),app=document.getElementById('app');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=d=>new Date(d+'T00:00').toLocaleDateString('es',{day:'numeric',month:'long',year:'numeric'});
-const stars=n=>n?'★'.repeat(n)+'☆'.repeat(5-n):'';
+const stars=n=>n?`<span class="stars" style="--r:${n}">★★★★★</span>`:'';
 const paras=t=>esc(t).split(/\n\s*\n/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
 const today=()=>new Date().toISOString().slice(0,10);
 const NAV=[['','Inicio'],['articulos','Artículos'],['resenas','Reseñas'],['comunidad','Comunidad'],['sobre-mi','Sobre mí'],['calendario','Calendario']];
 document.getElementById('nav').innerHTML=NAV.map(n=>`<a href="#/${n[0]}" data-r="${n[0]}">${n[1]}</a>`).join('');
 let posts=null;
-async function load(){if(posts)return posts;const {data,error}=await sb.from('posts').select('*').eq('status','publicado').order('publish_date',{ascending:false});if(error)throw error;return posts=data}
+let about={};
+async function load(){if(posts)return posts;const [r,a]=await Promise.all([sb.from('posts').select('*').eq('status','publicado').order('publish_date',{ascending:false}),sb.from('site').select('value').eq('key','about').maybeSingle()]);if(r.error)throw r.error;about=a.data?.value||{};chrome();return posts=r.data}
+function chrome(){if(about.logo_url)document.getElementById('logo').insertAdjacentHTML('afterbegin',`<img src="${esc(about.logo_url)}" alt="">`);
+const L=[['instagram','Instagram'],['tiktok','TikTok'],['goodreads','Goodreads']].filter(x=>about[x[0]]).map(x=>`<a href="${esc(about[x[0]])}" rel="noopener">${x[1]}</a>`).join('');
+document.getElementById('ft').innerHTML=`<div class="fi"><div><b class="flogo">El Tribunal de la Tinta</b><p>Cada libro tiene una historia.<br>Cada historia merece ser cuestionada.</p></div><div>${NAV.map(n=>`<a href="#/${n[0]}">${n[1]}</a>`).join('')}</div><div>${L}</div></div><p class="cp">© ${new Date().getFullYear()} El Tribunal de la Tinta. Todos los derechos reservados.</p>`}
 const live=()=>posts.filter(p=>p.publish_date<=today());
 const card=p=>`<a class="card" href="#/post/${p.id}">${p.cover_url?`<img src="${esc(p.cover_url)}" alt="">`:''}<small>${esc(p.category||p.genre||'')} · ${fmt(p.publish_date)}</small><h3>${esc(p.title)}</h3>${p.kind=='resena'?`<div class="st">${esc(p.book_author||'')} ${stars(p.rating)}</div>`:''}<p>${esc(p.excerpt||'')}</p></a>`;
 const grid=a=>a.length?`<div class="grid">${a.map(card).join('')}</div>`:'<p class="mut">Aún no hay publicaciones aquí.</p>';
 const V={
-async ''(){const l=live(),f=l.find(p=>p.featured)||l[0];
-return `<section class="hero"><p class="mut">Literatura, análisis y debate</p><h1>El Tribunal de la <em>Tinta</em></h1><p>Cada libro tiene una historia.<br>Cada historia merece ser cuestionada.</p></section>`
-+(f?`<section class="feat"><small style="color:#e9cfd4">Destacado</small><h2>${esc(f.title)}</h2><p>${esc(f.excerpt||'')}</p><a class="btn" href="#/post/${f.id}">Entrar al debate</a></section>`:'')
-+`<h2>Últimas publicaciones</h2>${grid(l.filter(p=>p.kind=='articulo').slice(0,4))}<h2>Reseñas recientes</h2>${grid(l.filter(p=>p.kind=='resena').slice(0,4))}`},
+async ''(){const l=live(),f=l.find(p=>p.featured)||l[0],ar=l.filter(p=>p.kind=='articulo'&&p!==f).slice(0,3),rv=l.filter(p=>p.kind=='resena').slice(0,3);
+const {data:cs}=await sb.from('submissions').select('*').eq('status','aprobada').order('created_at',{ascending:false}).limit(3);
+const hero=about.hero_url?`style="background-image:linear-gradient(90deg,rgba(248,241,231,.96),rgba(248,241,231,.7) 50%,rgba(248,241,231,0)),url('${esc(about.hero_url)}')"`:'';
+return `<section class="hero" ${hero}><div><p class="mut">Literatura · análisis · debate</p><h1>El Tribunal de la <em>Tinta</em></h1><p class="lead">Cada libro tiene una historia.<br>Cada historia merece ser cuestionada.</p><a class="btn" href="#/articulos">Explora el blog</a></div></section>`
++(f?`<section class="feat"><a href="#/post/${f.id}">${f.cover_url?`<img src="${esc(f.cover_url)}" alt="">`:'<div class="ph0"></div>'}</a><div><small>Artículo destacado</small><h2>${esc(f.title)}</h2><p>${esc(f.excerpt||'')}</p><small>${fmt(f.publish_date)} · ${esc(f.category||'')}</small><br><a class="btn" href="#/post/${f.id}">Leer más</a></div><blockquote class="q">“Un libro no termina en su última página: empieza la conversación.”<small>El Tribunal de la Tinta</small></blockquote></section>`:'')
++`<section class="cols"><div><h2>Últimos artículos</h2>${grid(ar)}<p><a href="#/articulos">Ver todos los artículos</a></p></div>
+<div><h2>Reseñas</h2>${rv.map(p=>`<a class="rv" href="#/post/${p.id}">${p.cover_url?`<img src="${esc(p.cover_url)}" alt="">`:'<div class="ph0"></div>'}<small>Reseña</small><b>${esc(p.title)}</b><small>${esc(p.book_author||'')}</small><span>${stars(p.rating)} ${p.rating?p.rating+'/5':''}</span></a>`).join('')||'<p class="mut">Aún no hay reseñas.</p>'}<p><a href="#/resenas">Ver todas las reseñas</a></p></div>
+<div><h2>Reseñas de la comunidad</h2>${(cs||[]).map(x=>`<div class="cm"><span class="av">${esc(x.reader_name[0])}</span><div><b>${esc(x.reader_name)}</b> ${stars(x.rating)}<p>“${esc(x.opinion.slice(0,110))}…”</p><small>${fmt(x.created_at.slice(0,10))}</small></div></div>`).join('')||'<p class="mut">Aún no hay reseñas de lectores.</p>'}<p><a href="#/comunidad">Ver todas</a></p></div></section>`},
+async buscar(q){q=decodeURIComponent(q||'').toLowerCase();const r=live().filter(p=>[p.title,p.excerpt,p.category,p.genre,p.book_author,p.content].join(' ').toLowerCase().includes(q));return `<h1>Resultados para «${esc(q)}»</h1>`+grid(r)},
 async articulos(){return `<h1>Artículos</h1>`+grid(live().filter(p=>p.kind=='articulo'))},
 async resenas(){const r=live().filter(p=>p.kind=='resena'),g=[...new Set(r.map(p=>p.genre).filter(Boolean))];
 return `<h1>Reseñas</h1><div class="bar"><select id="fg"><option value="">Todos los géneros</option>${g.map(x=>`<option>${esc(x)}</option>`).join('')}</select><select id="fo"><option value="d">Más recientes</option><option value="r">Mejor valoradas</option></select></div><div id="rl">${grid(r)}</div>`},
@@ -41,7 +50,7 @@ async calendario(){const m={},t=today();[...posts].sort((a,b)=>a.publish_date<b.
 return '<h1>Calendario editorial</h1>'+(Object.keys(m).map(k=>`<h3>${new Date(k+'-01T00:00').toLocaleDateString('es',{month:'long',year:'numeric'})}</h3><ul class="cal">${m[k].map(p=>`<li><b>${p.publish_date.slice(8)}</b> ${p.publish_date>t?esc(p.title):`<a href="#/post/${p.id}">${esc(p.title)}</a>`} <small>${p.kind=='resena'?'Reseña':'Artículo'}${p.publish_date>t?' · próximamente':''}</small></li>`).join('')}</ul>`).join('')||'<p class="mut">Sin publicaciones programadas.</p>')},
 async comunidad(){const {data}=await sb.from('submissions').select('*').eq('status','aprobada').order('created_at',{ascending:false});
 return `<h1>Comunidad lectora</h1><p>Comparte tu reseña de un libro. La revisaré antes de publicarla.</p>
-<form id="sf"><label>Título del libro<input name="book_title" required maxlength="150"></label><label>Autor o autora<input name="book_author" maxlength="150"></label><label>Valoración<select name="rating">${[5,4,3,2,1].map(n=>`<option value="${n}">${stars(n)}</option>`).join('')}</select></label><label>Tu opinión<textarea name="opinion" rows="6" required minlength="20" maxlength="3000"></textarea></label><label>Tu nombre<input name="reader_name" required maxlength="60"></label><input class="hp" name="web" tabindex="-1" autocomplete="off"><button>Enviar reseña</button></form>
+<form id="sf"><label>Título del libro<input name="book_title" required maxlength="150"></label><label>Autor o autora<input name="book_author" maxlength="150"></label><label>Valoración<select name="rating">${[5,4,3,2,1].map(n=>`<option value="${n}">${'★'.repeat(n)}</option>`).join('')}</select></label><label>Tu opinión<textarea name="opinion" rows="6" required minlength="20" maxlength="3000"></textarea></label><label>Tu nombre<input name="reader_name" required maxlength="60"></label><input class="hp" name="web" tabindex="-1" autocomplete="off"><button>Enviar reseña</button></form>
 <h2>Reseñas de lectores</h2>${(data||[]).map(x=>`<div class="rev"><b>${esc(x.book_title)}</b> ${esc(x.book_author||'')} ${stars(x.rating)}<br>${esc(x.opinion)}<br><small>${esc(x.reader_name)}</small></div>`).join('')||'<p class="mut">Aún no hay reseñas de lectores.</p>'}`}};
 function bind(id,fn,msg){const f=document.getElementById(id);if(!f)return;f.onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(f));if(d.web)return;const {error}=await fn(d);f.outerHTML=`<p class="${error?'err':'ok'}">${error?'No se pudo enviar. Inténtalo de nuevo.':msg}</p>`}}
 async function route(){const [r0,a]=(location.hash.slice(2)).split('/'),r=r0 in V?r0:'';app.classList.remove('in');
@@ -50,5 +59,6 @@ if(r=='resenas'){const f=()=>{let x=live().filter(p=>p.kind=='resena');if(fg.val
 if(r=='post')bind('cf',d=>sb.from('comments').insert({post_id:a,name:d.name,body:d.body}),'Gracias. Tu comentario se publicará cuando sea aprobado.');
 if(r=='comunidad')bind('sf',d=>sb.from('submissions').insert({book_title:d.book_title,book_author:d.book_author,rating:+d.rating,opinion:d.opinion,reader_name:d.reader_name}),'Gracias. Tu reseña se publicará cuando sea aprobada.');
 document.querySelectorAll('nav a').forEach(x=>x.classList.toggle('on',x.dataset.r==r));scrollTo(0,0);requestAnimationFrame(()=>app.classList.add('in'))}
+document.getElementById('sq').onsubmit=e=>{e.preventDefault();const q=e.target.q.value.trim();if(q)location.hash='#/buscar/'+encodeURIComponent(q)};
 addEventListener('hashchange',route);route();
 </script></body></html>

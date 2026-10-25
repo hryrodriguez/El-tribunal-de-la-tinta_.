@@ -15,7 +15,7 @@ function form(p={}){main.innerHTML=`<form id="pf"><h2>${p.id?'Editar':'Nueva'} p
 <label>Tipo<select name="kind"><option value="articulo">Artículo</option><option value="resena">Reseña</option></select></label>
 ${F('title','Título',p.title)}${F('excerpt','Resumen corto',p.excerpt)}${F('cover_url','URL de la imagen de portada',p.cover_url,'url')}${F('category','Categoría',p.category)}
 ${F('book_author','Autor del libro (reseñas)',p.book_author)}${F('genre','Género (reseñas)',p.genre)}
-<label>Puntuación (reseñas)<select name="rating"><option value="">Sin puntuación</option>${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join('')}</select></label>
+<label>Puntuación (reseñas)<select name="rating"><option value="">Sin puntuación</option>${[0.5,1,1.5,2,2.5,3,3.5,4,4.5,5].map(n=>`<option>${n}</option>`).join('')}</select></label>
 ${F('publish_date','Fecha de publicación',p.publish_date||new Date().toISOString().slice(0,10),'date')}
 ${T('content','Contenido (una línea en blanco separa párrafos)',p.content,14)}
 <label class="chk"><input type="checkbox" name="featured" ${p.featured?'checked':''}> Destacar en la portada</label>
@@ -35,7 +35,7 @@ const btn=(t,x)=>['aprobada','rechazada'].map(v=>`<button class="sec" data-a="st
 main.innerHTML=`<h2>Reseñas de lectores</h2><ul class="rows">${(s.data||[]).map(x=>`<li><b>${esc(x.book_title)}</b> ${esc(x.book_author||'')} ${'★'.repeat(x.rating)}<br><small>${esc(x.reader_name)} · ${x.status}</small><p>${esc(x.opinion)}</p><span>${btn('submissions',x)}</span></li>`).join('')||'<li>Sin envíos.</li>'}</ul>
 <h2>Comentarios</h2><ul class="rows">${(c.data||[]).map(x=>`<li><b>${esc(x.name)}</b> en «${esc(x.posts?.title||'')}»<br><small>${x.status}</small><p>${esc(x.body)}</p><span>${btn('comments',x)}</span></li>`).join('')||'<li>Sin comentarios.</li>'}</ul>`},
 async about(){const {data}=await sb.from('site').select('value').eq('key','about').maybeSingle(),v=data?.value||{};
-main.innerHTML=`<form id="af"><h2>Sobre mí</h2>${T('bio','Biografía',v.bio)}${T('journey','Experiencia y trayectoria como lectora',v.journey)}${T('why','Por qué creé el blog',v.why)}${T('offers','Qué ofrece a los lectores',v.offers)}${F('photo_url','URL de tu fotografía',v.photo_url,'url')}${F('instagram','Enlace de Instagram',v.instagram,'url')}${F('tiktok','Enlace de TikTok',v.tiktok,'url')}${F('goodreads','Enlace de Goodreads',v.goodreads,'url')}<button>Guardar</button></form>`;
+main.innerHTML=`<form id="af"><h2>Sobre mí</h2>${T('bio','Biografía',v.bio)}${T('journey','Experiencia y trayectoria como lectora',v.journey)}${T('why','Por qué creé el blog',v.why)}${T('offers','Qué ofrece a los lectores',v.offers)}${F('photo_url','URL de tu fotografía',v.photo_url,'url')}${F('hero_url','Foto de la portada del inicio (URL)',v.hero_url,'url')}${F('logo_url','Logo (URL)',v.logo_url,'url')}${F('instagram','Enlace de Instagram',v.instagram,'url')}${F('tiktok','Enlace de TikTok',v.tiktok,'url')}${F('goodreads','Enlace de Goodreads',v.goodreads,'url')}<button>Guardar</button></form>`;
 document.getElementById('af').onsubmit=async e=>{e.preventDefault();const {error}=await sb.from('site').upsert({key:'about',value:Object.fromEntries(new FormData(e.target))});alert(error?error.message:'Guardado')}}};
 main.onclick=async e=>{const b=e.target.closest('[data-a]');if(!b)return;const {a,id,t,s}=b.dataset;
 if(a=='new')return form();if(a=='cx')return go('posts');
