@@ -1,4 +1,4 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Administración · El Tribunal de la Tinta</title><link rel="stylesheet" href="style.css"><style>[hidden]{display:none!important}</style></head><body>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Administración · El Tribunal de la Tinta</title><link rel="stylesheet" href="style.css"><style>[hidden]{display:none!important}.gn{display:flex;flex-wrap:wrap;gap:2px 16px;border:1px solid #bfae95;padding:8px 12px;margin:12px 0}.gn label{margin:4px 0;font-size:14px}.gn input{width:auto}</style></head><body>
 <header><span class="logo">Administración</span><nav id="tabs" hidden><a href="#" data-v="posts">Publicaciones</a><a href="#" data-v="pend">Pendientes</a><a href="#" data-v="about">Sobre mí</a><a href="index.html">Ver blog</a><a href="#" id="out">Salir</a></nav></header>
 <main class="in" id="main"></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -11,18 +11,20 @@ const T=(n,l,v='',r=5)=>`<label>${l}<textarea name="${n}" rows="${r}">${esc(v)}<
 function login(msg=''){tabs.hidden=true;main.innerHTML=`<form id="lf"><h2>Entrar</h2>${F('email','Correo','','email')}${F('password','Contraseña','','password')}<p class="err">${msg}</p><button>Entrar</button> <a href="index.html">Volver al blog</a><p><small>Versión segura 2</small></p></form>`;
 document.getElementById('lf').onsubmit=async e=>{e.preventDefault();const f=e.target,{error}=await sb.auth.signInWithPassword({email:f.email.value,password:f.password.value});if(error)return login('Correo o contraseña incorrectos.');const {data}=await sb.rpc('is_admin');if(!data){await sb.auth.signOut();return login('Esta cuenta no es de administración.')}go('posts')}}
 async function go(v){const {data}=await sb.auth.getSession();if(!data.session)return login();tabs.hidden=false;views[v]()}
-function form(p={}){main.innerHTML=`<form id="pf"><h2>${p.id?'Editar':'Nueva'} publicación</h2>
+const CATS=['Análisis literario','Opinión','Debate','Controversia','Reflexiones','Distopía','Clásicos','Autores','Recomendaciones','Lecturas del mes','Poesía','Ensayo','Adaptaciones','Wattpad y lectura juvenil','Noticias literarias','Reseña'];
+const GENS=['Novela','Cuento','Poesía','Teatro','Ensayo','Biografía y memorias','Ciencia ficción','Fantasía','Distopía','Terror','Misterio','Policíaca y negra','Thriller','Romance','Novela histórica','Aventura','Juvenil','Infantil','Clásicos','Realismo mágico','Drama','Humor','Filosofía','Historia','Psicología','Ciencia','Autoayuda','Cómic y novela gráfica','Manga','Ficción contemporánea','No ficción'];
+function form(p={}){const sel=(p.genre||'').split(', ').filter(Boolean),cs=CATS.includes(p.category)||!p.category?CATS:[...CATS,p.category],gs=[...GENS,...sel.filter(x=>!GENS.includes(x))];main.innerHTML=`<form id="pf"><h2>${p.id?'Editar':'Nueva'} publicación</h2>
 <label>Tipo<select name="kind"><option value="articulo">Artículo</option><option value="resena">Reseña</option></select></label>
-${F('title','Título',p.title)}${F('excerpt','Resumen corto',p.excerpt)}${F('cover_url','Imagen de portada (nombre del archivo o URL)',p.cover_url,'text')}${F('category','Categoría',p.category)}
-${F('book_author','Autor del libro (reseñas)',p.book_author)}${F('genre','Género (reseñas)',p.genre)}
+${F('title','Título',p.title)}${F('excerpt','Resumen corto',p.excerpt)}${F('cover_url','Imagen de portada (nombre del archivo o URL)',p.cover_url,'text')}<label>Categoría<select name="category"><option value="">Sin categoría</option>${cs.map(c=>`<option ${c==p.category?'selected':''}>${esc(c)}</option>`).join('')}</select></label>
+${F('book_author','Autor del libro (reseñas)',p.book_author)}<fieldset class="gn"><legend>Géneros (hasta 3)</legend>${gs.map(g=>`<label><input type="checkbox" name="g" value="${esc(g)}" ${sel.includes(g)?'checked':''}> ${esc(g)}</label>`).join('')}</fieldset>
 <label>Puntuación (reseñas)<select name="rating"><option value="">Sin puntuación</option>${[0.5,1,1.5,2,2.5,3,3.5,4,4.5,5].map(n=>`<option>${n}</option>`).join('')}</select></label>
 ${F('publish_date','Fecha de publicación',p.publish_date||new Date().toISOString().slice(0,10),'date')}
 ${T('content','Contenido (una línea en blanco separa párrafos)',p.content,14)}
 <label class="chk"><input type="checkbox" name="featured" ${p.featured?'checked':''}> Destacar en la portada</label>
 <button value="publicado">Publicar</button> <button value="borrador" class="sec">Guardar borrador</button> <button type="button" class="sec" data-a="cx">Cancelar</button></form>`;
-const f=document.getElementById('pf');f.kind.value=p.kind||'articulo';f.rating.value=p.rating||'';
+const f=document.getElementById('pf');f.kind.value=p.kind||'articulo';f.onchange=e=>{if(e.target.name=='g'&&f.querySelectorAll('[name=g]:checked').length>3){e.target.checked=false;alert('Puedes elegir hasta 3 géneros.')}};f.rating.value=p.rating||'';
 f.onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(f)),feat=f.featured.checked;
-const row={kind:d.kind,title:d.title,excerpt:d.excerpt,cover_url:d.cover_url,category:d.category,book_author:d.book_author,genre:d.genre,rating:d.rating?+d.rating:null,publish_date:d.publish_date,content:d.content,status:e.submitter.value,featured:feat};
+const row={kind:d.kind,title:d.title,excerpt:d.excerpt,cover_url:d.cover_url,category:d.category,book_author:d.book_author,genre:[...f.querySelectorAll('[name=g]:checked')].map(x=>x.value).join(', '),rating:d.rating?+d.rating:null,publish_date:d.publish_date,content:d.content,status:e.submitter.value,featured:feat};
 if(feat)await sb.from('posts').update({featured:false}).neq('id',p.id||'00000000-0000-0000-0000-000000000000');
 const {error}=await(p.id?sb.from('posts').update(row).eq('id',p.id):sb.from('posts').insert(row));
 if(error)return alert('No se pudo guardar: '+error.message);go('posts')}}
