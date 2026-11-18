@@ -32,6 +32,10 @@
     {% if page.cover_url and page.cover_url != "" %}<img class="ph" src="{{ page.cover_url }}" alt="{{ page.title | escape }}">{% endif %}
     {% if page.kind == "resena" %}<p class="st">{{ page.libro_autor }} · {{ page.genre }} {% if page.calificacion and page.calificacion != "" %}<span class="stars" style="--r:{{ page.calificacion }}">★★★★★</span>{% endif %}</p>{% endif %}
     {{ content }}
+    <section style="border-top:1px solid var(--l);margin-top:32px;padding-top:20px">
+      <h3>¿Te gustó? Recibe las nuevas reseñas en tu correo</h3>
+      <a class="btn" href="https://tribunaldelatinta.substack.com/subscribe">Suscribirme gratis</a>
+    </section>
     <p><a class="btn" href="{{ home }}#/post/{{ page.post_id }}">Ver y dejar comentarios</a></p>
   </article>
 </main>
