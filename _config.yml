@@ -1,3 +1,5 @@
 theme: minima
+url: "https://hryrodriguez.github.io"
+baseurl: "/El-tribunal-de-la-tinta_."
 plugins:
   - jekyll-sitemap
