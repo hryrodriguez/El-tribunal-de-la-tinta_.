@@ -4,6 +4,14 @@ const path = require('path');
 const URL = 'https://feaxgrwhdjbzcdhcxwsd.supabase.co';
 const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlYXhncndoZGpiemNkaGN4d3NkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4NjE3OTMsImV4cCI6MjEwODQzNzc5M30.WfdJuNqAhB_d-cmJycfGc6Jxpvs4ixfjGO4DtC2mzDo';
 
+const get = async (ruta) => {
+  const r = await fetch(`${URL}/rest/v1/${ruta}`, {
+    headers: { apikey: KEY, Authorization: `Bearer ${KEY}` },
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+};
+
 const slug = (s) =>
   String(s || 'sin-titulo')
     .toLowerCase()
@@ -16,13 +24,31 @@ const slug = (s) =>
 const q = (s) =>
   '"' + String(s ?? '').replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\s+/g, ' ').trim() + '"';
 
+const esc = (s) =>
+  String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const paras = (t) =>
+  esc(t)
+    .split(/\n\s*\n/)
+    .map((p) => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+    .join('\n\n');
+
+const fecha = (d) =>
+  new Date(d + 'T00:00').toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' });
+
 (async () => {
-  const r = await fetch(
-    `${URL}/rest/v1/posts?status=eq.publicado&select=*&order=publish_date.desc`,
-    { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } }
+  const hoy = new Date().toISOString().slice(0, 10);
+  const posts = (await get('posts?status=eq.publicado&select=*&order=publish_date.desc')).filter(
+    (p) => p.publish_date <= hoy
   );
-  if (!r.ok) throw new Error(await r.text());
-  const posts = await r.json();
+
+  try {
+    const s = await get('site?key=eq.about&select=value');
+    fs.mkdirSync('_data', { recursive: true });
+    fs.writeFileSync('_data/about.json', JSON.stringify(s[0]?.value || {}, null, 2));
+  } catch (e) {
+    console.log('No se pudo leer site:', e.message);
+  }
 
   fs.mkdirSync('_posts', { recursive: true });
   for (const f of fs.readdirSync('_posts')) {
@@ -31,29 +57,28 @@ const q = (s) =>
   }
 
   for (const p of posts) {
+    const resumen = p.excerpt || String(p.content || '').replace(/\s+/g, ' ').slice(0, 155);
     const fm = [
       '---',
       'layout: post',
       `title: ${q(p.title)}`,
       `date: ${p.publish_date}`,
-      `description: ${q(p.excerpt || '')}`,
-      p.book_author ? `libro_autor: ${q(p.book_author)}` : '',
-      p.rating ? `calificacion: ${p.rating}` : '',
+      `fecha_texto: ${q(fecha(p.publish_date))}`,
+      `description: ${q(resumen)}`,
+      `kind: ${q(p.kind)}`,
+      `category: ${q(p.category)}`,
+      `genre: ${q(p.genre)}`,
+      `libro_autor: ${q(p.book_author)}`,
+      `calificacion: ${p.rating ?? '""'}`,
+      `cover_url: ${q(p.cover_url)}`,
+      `post_id: ${q(p.id)}`,
       'generado: true',
       '---',
-      '',
-    ].filter((l, i) => l !== '' || i === 8 || i > 7);
+    ].join('\n');
 
-    let intro = '';
-    if (p.kind === 'resena' && (p.book_author || p.rating)) {
-      intro =
-        [p.book_author ? `**Autor:** ${p.book_author}` : '', p.rating ? `**Calificación:** ${p.rating}/5` : '']
-          .filter(Boolean)
-          .join(' · ') + '\n\n';
-    }
-
-    const file = `${p.publish_date}-${slug(p.title)}.md`;
-    fs.writeFileSync(path.join('_posts', file), fm.join('\n') + '\n' + intro + (p.content || '') + '\n');
+    const cuerpo = '{% raw %}\n' + paras(p.content) + '\n{% endraw %}\n';
+    const archivo = `${p.publish_date}-${slug(p.title)}.md`;
+    fs.writeFileSync(path.join('_posts', archivo), fm + '\n\n' + cuerpo);
   }
   console.log(`Generadas ${posts.length} páginas`);
 })();
